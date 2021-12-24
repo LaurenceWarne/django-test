@@ -1,13 +1,42 @@
 # A Django Example Project
 
-To start the server:
+## Running
 
-```base
-tox python manage.py runserver
+First ensure you have tox and Python 3.9 installation on your system, then clone the repo:
+
+```bash
+git clone https://github.com/LaurenceWarne/django-test
 ```
 
-To run the tests:
+Create the necessary migrations:
 
-```base
-tox
+```bash
+tox -e py39 python manage.py makemigrations
+```
+
+Run the migrations:
+
+```bash
+tox -e py39 python manage.py migrate
+```
+
+Start a dev server:
+
+```bash
+tox -e py39 python manage.py runserver
+```
+
+Hit it!
+
+```bash
+curl -X POST http://127.0.0.1:8000/create-candidate --data '{"ref":"12345678","name":"dave"}'
+curl -X GET http://127.0.0.1:8000/get-candidate/1234678
+```
+
+## Testing
+
+You can run the tests via:
+
+```bash
+tox -e py39
 ```
