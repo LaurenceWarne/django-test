@@ -7,6 +7,7 @@ CANDIDATE_PKEY_VALIDATOR = RegexValidator(
     "Candidate Reference should be a unique string of 8 letters and digits"
 )
 
+
 class Candidate(models.Model):
     ref = models.CharField(
         primary_key=True, max_length=8, validators=[CANDIDATE_PKEY_VALIDATOR]

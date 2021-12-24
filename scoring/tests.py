@@ -93,7 +93,7 @@ class CreateScoreTestCase(TestCase):
         )
         self.assertEqual(response.status_code, 400)
 
-        
+
 class GetCandidateTestCase(TestCase):
 
     def setUp(self):
@@ -126,8 +126,7 @@ class GetCandidateTestCase(TestCase):
     def test_error_on_inexistent_candidate(self):
         response = self.client.get(f"/get-candidate/876532A")
         self.assertEqual(response.status_code, 400)
-        
+
     def test_error_on_bad_method(self):
         response = self.client.post("/get-candidate/12345678")
         self.assertEqual(response.status_code, 405)
-        

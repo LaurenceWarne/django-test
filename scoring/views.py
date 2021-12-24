@@ -1,3 +1,10 @@
+"""
+Views corresponding to the three endpoints:
+
+  - POST /create-candidate
+  - POST /create-score
+  - GET /get-candidate/<ref>
+"""
 import json
 from typing import Callable
 
@@ -11,8 +18,7 @@ CREATE_CANDIDATE_BAD_JSON_ERR_MSG = "The request JSON must be of the form: " +\
     "{'ref': <ref>, 'name': <name>}"
 CREATE_SCORE_BAD_JSON_ERR_MSG = "The request JSON must be of the form: " +\
     "{'candidate-ref': <ref>, 'score': <score>}"
-
-View = Callable[[HttpRequest], HttpResponse]
+View = Callable[[HttpRequest, ...], HttpResponse]
 
 
 def accept_http_method(accepted: str) -> Callable[[str], Callable[[View], View]]:
@@ -27,11 +33,10 @@ def accept_http_method(accepted: str) -> Callable[[str], Callable[[View], View]]
         def wrapped(request: HttpRequest, *args, **kwargs) -> HttpResponse:
             if request.method == accepted:
                 return func(request, *args, **kwargs)
-            else:
-                name = func.__name__
-                error_msg = f"Expected method '{accepted}' for {name}" +\
-                    f"but got '{request.method}'"
-                return JsonResponse({"errors": [error_msg]}, status=405)
+            name = func.__name__
+            error_msg = f"Expected method '{accepted}' for {name}" +\
+                f"but got '{request.method}'"
+            return JsonResponse({"errors": [error_msg]}, status=405)
         return wrapped
     return decorate
 
@@ -80,7 +85,7 @@ def create_score(request: HttpRequest) -> JsonResponse:
 
 
 @accept_http_method("GET")
-def get_candidate(request: HttpRequest, ref: str) -> JsonResponse:
+def get_candidate(_: HttpRequest, ref: str) -> JsonResponse:
     try:
         candidate = Candidate.objects.filter(ref=ref).first()
         if candidate is None:
