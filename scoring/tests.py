@@ -46,7 +46,7 @@ class CreateScoreTestCase(TestCase):
             {"ref": self.candidate_ref, "name": "foo"},
             content_type="application/json"
         )
-        data = {"candidate_ref": self.candidate_ref, "score": "10"}
+        data = {"candidate_ref": self.candidate_ref, "score": 10.3}
         response = self.client.post(
             "/create-score", data, content_type="application/json"
         )
@@ -58,7 +58,7 @@ class CreateScoreTestCase(TestCase):
             {"ref": self.candidate_ref, "name": "foo"},
             content_type="application/json"
         )
-        data = {"candidate_ref": self.candidate_ref, "score": "10"}
+        data = {"candidate_ref": self.candidate_ref, "score": 10}
         response1 = self.client.post(
             "/create-score", data, content_type="application/json"
         )
@@ -68,8 +68,20 @@ class CreateScoreTestCase(TestCase):
         self.assertEqual(response1.status_code, 200)
         self.assertEqual(response2.status_code, 200)
 
+    def test_error_if_score_out_of_range(self):
+        data1 = {"candidate_ref": self.candidate_ref, "score": 103}
+        response1 = self.client.post(
+            "/create-score", data1, content_type="application/json"
+        )
+        data2 = {"candidate_ref": self.candidate_ref, "score": -3}
+        response2 = self.client.post(
+            "/create-score", data2, content_type="application/json"
+        )        
+        self.assertEqual(response1.status_code, 400)
+        self.assertEqual(response2.status_code, 400)
+
     def test_error_on_inexistent_ref(self):
-        data = {"candidate_ref": "87654321", "score": "10"}
+        data = {"candidate_ref": "87654321", "score": 10}
         response = self.client.post(
             "/create-score", data, content_type="application/json"
         )
@@ -80,7 +92,7 @@ class CreateScoreTestCase(TestCase):
         self.assertEqual(response.status_code, 405)
 
     def test_error_on_bad_json(self):
-        data = {"not-an-identifier": "12345678", "score": "10"}
+        data = {"not-an-identifier": "12345678", "score": 10}
         response = self.client.post(
             "/create-score", data, content_type="application/json"
         )
@@ -108,11 +120,11 @@ class GetCandidateTestCase(TestCase):
             content_type="application/json"
         )
         scores = [score1 := 10, score2 := 55]
-        data1 = {"candidate_ref": self.candidate_ref, "score": str(score1)}
+        data1 = {"candidate_ref": self.candidate_ref, "score": score1}
         self.client.post(
             "/create-score", data1, content_type="application/json"
         )
-        data2 = {"candidate_ref": self.candidate_ref, "score": str(score2)}
+        data2 = {"candidate_ref": self.candidate_ref, "score": score2}
         self.client.post(
             "/create-score", data2, content_type="application/json"
         )

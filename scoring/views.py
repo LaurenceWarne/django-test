@@ -49,12 +49,13 @@ def create_candidate(request: HttpRequest) -> JsonResponse:
         candidate.full_clean()
     except (KeyError, json.JSONDecodeError):
         return JsonResponse(
-            {"errors": [CREATE_CANDIDATE_BAD_JSON_ERR_MSG]}, status=400
+            {"errors": CREATE_CANDIDATE_BAD_JSON_ERR_MSG}, status=400
         )
     except ValidationError as e:
-        return JsonResponse({"errors": [str(e)]}, status=400)
+        return JsonResponse({"errors": e.message_dict}, status=400)
     else:
         candidate.save()
+        # The spec doesn't specify, but we return the candidate back anyway
         return JsonResponse(data)
 
 
@@ -78,7 +79,7 @@ def create_score(request: HttpRequest) -> JsonResponse:
         error_msg = f"Expected float for score but found: '{score_val}'"
         return JsonResponse({"errors": [error_msg]}, status=400)
     except ValidationError as e:
-        return JsonResponse({"errors": [str(e)]}, status=400)
+        return JsonResponse({"errors": e.message_dict}, status=400)
     else:
         score.save()
         return JsonResponse(data)
@@ -86,16 +87,12 @@ def create_score(request: HttpRequest) -> JsonResponse:
 
 @accept_http_method("GET")
 def get_candidate(_: HttpRequest, ref: str) -> JsonResponse:
-    try:
-        candidate = Candidate.objects.filter(ref=ref).first()
-        if candidate is None:
-            error_msg = f"No candidate found with ref '{ref}'"
-            return JsonResponse({"errors": [error_msg]}, status=400)
-        scores_query = Score.objects.values_list("score", flat=True)
-        scores = list(scores_query.filter(candidate=candidate))
-    except ValidationError as e:
-        return JsonResponse({"errors": [str(e)]}, status=400)
-    else:
-        return JsonResponse(
-            {"candidate_ref": ref, "name": candidate.name, "scores": scores}
-        )
+    candidate = Candidate.objects.filter(ref=ref).first()
+    if candidate is None:
+        error_msg = f"No candidate found with ref '{ref}'"
+        return JsonResponse({"errors": {"candidate": error_msg}}, status=400)
+    scores_query = Score.objects.values_list("score", flat=True)
+    scores = list(scores_query.filter(candidate=candidate))
+    return JsonResponse(
+        {"candidate_ref": ref, "name": candidate.name, "scores": scores}
+    )
