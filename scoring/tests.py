@@ -68,7 +68,7 @@ class CreateScoreTestCase(TestCase):
         self.assertEqual(response1.status_code, 200)
         self.assertEqual(response2.status_code, 200)
 
-    def test_error_on_inexistant_ref(self):
+    def test_error_on_inexistent_ref(self):
         data = {"candidate_ref": "87654321", "score": "10"}
         response = self.client.post(
             "/create-score", data, content_type="application/json"
@@ -92,4 +92,42 @@ class CreateScoreTestCase(TestCase):
             "/create-score", data, content_type="application/json"
         )
         self.assertEqual(response.status_code, 400)
+
+        
+class GetCandidateTestCase(TestCase):
+
+    def setUp(self):
+        self.client = Client()
+        self.candidate_ref = "ref12345"
+        self.candidate_name = "foo"
+
+    def test_can_retrieve_candidate_and_multiple_scores(self):
+        self.client.post(
+            "/create-candidate",
+            {"ref": self.candidate_ref, "name": self.candidate_name},
+            content_type="application/json"
+        )
+        scores = [score1 := 10, score2 := 55]
+        data1 = {"candidate_ref": self.candidate_ref, "score": str(score1)}
+        self.client.post(
+            "/create-score", data1, content_type="application/json"
+        )
+        data2 = {"candidate_ref": self.candidate_ref, "score": str(score2)}
+        self.client.post(
+            "/create-score", data2, content_type="application/json"
+        )
+        response = self.client.get(f"/get-candidate/{self.candidate_ref}")
+        body = json.loads(response.content)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(body["candidate_ref"], self.candidate_ref)
+        self.assertEqual(body["name"], self.candidate_name)
+        self.assertEqual({float(x) for x in body["scores"]}, set(scores))
+
+    def test_error_on_inexistent_candidate(self):
+        response = self.client.get(f"/get-candidate/876532A")
+        self.assertEqual(response.status_code, 400)
+        
+    def test_error_on_bad_method(self):
+        response = self.client.post("/get-candidate/12345678")
+        self.assertEqual(response.status_code, 405)
         
