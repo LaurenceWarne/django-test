@@ -29,8 +29,8 @@ tox -e py39 python manage.py runserver
 Hit it!
 
 ```bash
-curl -X POST http://127.0.0.1:8000/create-candidate --data '{"ref":"12345678","name":"dave"}'
-curl -X GET http://127.0.0.1:8000/get-candidate/1234678
+curl -X POST http://127.0.0.1:8000/create-candidate -H "Content-Type: application/json" --data '{"ref":"12345678","name":"dave"}'
+curl -X GET http://127.0.0.1:8000/get-candidate/12345678
 ```
 
 ## Testing

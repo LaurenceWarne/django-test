@@ -76,7 +76,7 @@ class CreateScoreTestCase(TestCase):
         data2 = {"candidate_ref": self.candidate_ref, "score": -3}
         response2 = self.client.post(
             "/create-score", data2, content_type="application/json"
-        )        
+        )
         self.assertEqual(response1.status_code, 400)
         self.assertEqual(response2.status_code, 400)
 

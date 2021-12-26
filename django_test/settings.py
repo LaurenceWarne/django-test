@@ -30,14 +30,10 @@ ALLOWED_HOSTS = []
 
 # Application definition
 
-INSTALLED_APPS = [
-    'django.contrib.contenttypes',
-    "scoring.apps.ScoringConfig"
-]
+INSTALLED_APPS = ["scoring.apps.ScoringConfig"]
 
 MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 

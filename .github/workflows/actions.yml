@@ -1,0 +1,33 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python 3.9
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.9
+    - name: Install dependencies
+      run: pip install tox
+    - name: Lint
+      run: |
+        tox -e lint
+        git diff --exit-code
+    - name: Run migrations
+      run: |
+        tox -e py39 python manage.py makemigrations
+        tox -e py39 python manage.py migrate
+    - name: Test
+      run: tox -e py39
+    - name: Coverage
+      run: tox -e coverage
