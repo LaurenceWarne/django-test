@@ -3,13 +3,21 @@
 
 ## Running
 
-First ensure you have a tox and Python 3.9 installation on your system, then clone the repo:
+First clone the repo:
 
 ```bash
 git clone https://github.com/LaurenceWarne/django-test
+cd django-test
 ```
 
-Create the necessary migrations:
+From here you can:
+
+```bash
+docker build . -t django-test
+docker run --rm -d -p 8000:8000 django-test
+```
+
+And skip to the last step.  Alternatively, ensure you have a Python 3.9 and tox installation on your system and create the necessary migrations:
 
 ```bash
 tox -e py39 python manage.py makemigrations
