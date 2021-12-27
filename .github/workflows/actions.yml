@@ -29,5 +29,9 @@ jobs:
         tox -e py39 python manage.py migrate
     - name: Test
       run: tox -e py39
-    - name: Coverage
+    - name: Generate Coverage Report
       run: tox -e coverage
+    - name: Upload Coverage
+      uses: codecov/codecov-action@v1
+      with:
+        verbose: false
